@@ -4,7 +4,7 @@
  * Copyright © 2024 Andrew Serra <andy@serra.us>
  */
 
-package cmd
+package testsourcecli
 
 import (
 	"fmt"

@@ -4,10 +4,8 @@
  * Copyright © 2024 Andrew Serra <andy@serra.us>
  */
 
-package main
-
-import cli "github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli"
+package testsourcecli
 
 func main() {
-	cli.Execute()
+	rootCmd.Execute()
 }
