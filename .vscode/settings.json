@@ -1,0 +1,21 @@
+{
+    "git.autofetch": true,
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "fileHeaderComment.parameter": {
+        "*": {
+            "firstname": "Andrew",
+            "lastname": "Serra",
+            "email": "andy@serra.us"
+        }
+    },
+    "fileHeaderComment.template": {
+        "*":[
+            "${commentbegin}",
+            "${commentprefix} Created on ${date}",
+            "${commentprefix}",
+            "${commentprefix} Copyright © ${year} ${firstname} ${lastname} <${email}>",
+            "${commentend}"
+        ]
+    }
+}
