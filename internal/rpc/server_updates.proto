@@ -1,0 +1,32 @@
+/*
+ * Created on Sun Dec 15 2024
+ *
+ * Copyright © 2024 Andrew Serra <andy@serra.us>
+ */
+
+syntax="proto3";
+
+package rpc;
+
+message AssignmentUpdateRequest {
+    string assignment_id = 1;
+}
+
+message AssignmentUpdateResponse {
+
+}
+
+message CourseUpdateRequest {
+    string course_id = 1;
+}
+
+message CourseUpdateResponse {
+
+}
+
+service ServerUpdatesService {
+    //
+    rpc AssignmentUpdate(AssignmentUpdateRequest) returns (AssignmentUpdateResponse);
+    //
+    rpc CourseUpdate(CourseUpdateRequest) returns (CourseUpdateResponse);
+}
