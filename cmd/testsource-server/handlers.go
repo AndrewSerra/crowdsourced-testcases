@@ -116,6 +116,34 @@ func GetAssignmentHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, assignment)
 }
 
+func GetAssignmentsForCourseHandler(c *gin.Context) {
+	param_cid := c.Params.ByName("cid")
+
+	if param_cid == "" {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	cid, err := strconv.Atoi(param_cid)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	assignments, err := GetAssignmentsForCourse(cid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, assignments)
+}
+
 func DeleteAssignmentHandler(c *gin.Context) {
 	param_cid := c.Params.ByName("cid")
 	param_aid := c.Params.ByName("aid")

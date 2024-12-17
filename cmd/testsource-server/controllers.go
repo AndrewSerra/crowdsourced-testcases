@@ -221,6 +221,29 @@ func GetAssignment(courseid int, assignmentid int) (*Assignment, error) {
 	return &assignment, nil
 }
 
+func GetAssignmentsForCourse(courseid int) ([]*Assignment, error) {
+	db := GetDB()
+
+	rows, err := db.Query("SELECT id, title, course_id, start_date, end_date, is_open, is_published FROM assignments WHERE course_id = ?", courseid)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	var assignments []*Assignment = []*Assignment{}
+	for rows.Next() {
+		var assignment Assignment
+		err := rows.Scan(&assignment.Id, &assignment.Name, &assignment.CourseId, &assignment.StartDate, &assignment.EndDate, &assignment.IsOpen, &assignment.IsPublished)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		assignments = append(assignments, &assignment)
+	}
+
+	return assignments, nil
+}
+
 func DeleteAssignment(courseid int, assignmentid int) (int, error) {
 	db := GetDB()
 

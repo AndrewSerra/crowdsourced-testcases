@@ -28,6 +28,7 @@ func main() {
 		assignmentGroup := courseGroup.Group("/:cid/assignments")
 		{
 			assignmentGroup.POST("/", CreateAssignmentHandler)
+			assignmentGroup.GET("/", GetAssignmentsForCourseHandler)
 			assignmentGroup.GET("/:aid", GetAssignmentHandler)
 			assignmentGroup.DELETE("/:aid", DeleteAssignmentHandler)
 			assignmentGroup.POST("/:aid/*action", AssignmentActionsHandler)
