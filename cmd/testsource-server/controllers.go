@@ -8,6 +8,7 @@ package main
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 )
@@ -214,18 +215,19 @@ func DeleteAssignment(courseid int, assignmentid int) error {
 	return nil
 }
 
-func UpdateAssignment() {
-
-}
-
-func publishAssignmentGrades(courseid int, assignmentid int, value int) (int, error) {
+func updateAssignment(cid int, aid int, val int, col string) (int, error) {
 	db := GetDB()
 
-	if value < 0 || value > 1 {
-		return -1, errors.New("invalid value for is_published")
+	if val < 0 || val > 1 {
+		return -1, fmt.Errorf("invalid value for %s", col)
 	}
 
-	result, err := db.Exec("UPDATE assignments SET is_published = ? WHERE id = ? AND course_id = ?", value, assignmentid, courseid)
+	if col != "is_open" && col != "is_published" {
+		return -1, errors.New("invalid column name")
+	}
+
+	query := fmt.Sprintf("UPDATE assignments SET %s = ? WHERE id = ? AND course_id = ?", col)
+	result, err := db.Exec(query, val, aid, cid)
 	if err != nil {
 		log.Println(err)
 		return -1, err
@@ -240,12 +242,28 @@ func publishAssignmentGrades(courseid int, assignmentid int, value int) (int, er
 	return int(rowCount), nil
 }
 
+func publishingAssignmentGrades(courseid int, assignmentid int, value int) (int, error) {
+	return updateAssignment(courseid, assignmentid, value, "is_published")
+}
+
+func openingAssignmentGrades(courseid int, assignmentid int, value int) (int, error) {
+	return updateAssignment(courseid, assignmentid, value, "is_open")
+}
+
 func SetPublishedAssignment(courseid int, assignmentid int) (int, error) {
-	return publishAssignmentGrades(courseid, assignmentid, 1)
+	return publishingAssignmentGrades(courseid, assignmentid, 1)
 }
 
 func ClearPublishedAssignment(courseid int, assignmentid int) (int, error) {
-	return publishAssignmentGrades(courseid, assignmentid, 0)
+	return publishingAssignmentGrades(courseid, assignmentid, 0)
+}
+
+func SetOpenAssignment(courseid int, assignmentid int) (int, error) {
+	return openingAssignmentGrades(courseid, assignmentid, 1)
+}
+
+func ClearOpenAssignment(courseid int, assignmentid int) (int, error) {
+	return openingAssignmentGrades(courseid, assignmentid, 0)
 }
 
 // Submission

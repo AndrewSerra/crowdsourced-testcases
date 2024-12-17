@@ -180,34 +180,32 @@ func AssignmentActionsHandler(c *gin.Context) {
 	}
 
 	action := c.Param("action")[1:]
+	var rowCount int
 
 	switch action {
 	case "publish":
-		rowCount, err := SetPublishedAssignment(cid, aid)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
-		} else if rowCount == 0 {
-			c.Status(http.StatusNoContent)
-		} else {
-			c.Status(http.StatusOK)
-		}
+		rowCount, err = SetPublishedAssignment(cid, aid)
 	case "unpublish":
-		rowCount, err := ClearPublishedAssignment(cid, aid)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
-		} else if rowCount == 0 {
-			c.Status(http.StatusNoContent)
-		} else {
-			c.Status(http.StatusOK)
-		}
+		rowCount, err = ClearPublishedAssignment(cid, aid)
+	case "open":
+		rowCount, err = SetOpenAssignment(cid, aid)
+	case "close":
+		rowCount, err = ClearOpenAssignment(cid, aid)
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": fmt.Sprintf("unknown action '%s'", action),
 		})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	} else if rowCount == 0 {
+		c.Status(http.StatusNoContent)
+	} else {
+		c.Status(http.StatusOK)
 	}
 }
 
