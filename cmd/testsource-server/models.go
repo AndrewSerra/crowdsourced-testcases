@@ -5,6 +5,8 @@
  */
 package main
 
+import "time"
+
 type SubmissionStatus int
 
 const (
@@ -15,51 +17,78 @@ const (
 
 // Base structs
 type submission struct {
-	CourseId    string `json:"course_id"`
-	OwnerId     string `json:"owner_id"`
-	SubmittedAt string `json:"submitted_at"`
+	CourseId     string `uri:"cid" json:"course_id" binding:"required"`
+	OwnerId      string `json:"owner_id" binding:"required"`
+	AssignmentId string `uri:"aid" json:"assignment_id" binding:"required"`
+	// SubmittedAt string `json:"submitted_at"`     // Maybe add it later for offline submission?
 }
 
 type person struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
+	FirstName string `json:"first_name" binding:"required"`
+	LastName  string `json:"last_name" binding:"required"`
+	Email     string `json:"email" binding:"required"`
 }
 
 // Derived structs and models
+type NewCourse struct {
+	Name    string `json:"name" binding:"required"`
+	OwnerId string `json:"owner_id" binding:"required"`
+}
 type Course struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id string `json:"id"`
+	NewCourse
+}
+
+type NewAssignment struct {
+	CourseId  string `json:"course_id"`
+	Name      string `json:"name" binding:"required"`
+	StartDate string `json:"start_date" binding:"required"`
+	EndDate   string `json:"end_date" binding:"required"`
 }
 
 type Assignment struct {
-	Id string `json:"id"`
+	Id          string    `json:"id"`
+	IsOpen      bool      `json:"is_open"`
+	IsPublished bool      `json:"is_published"`
+	StartDate   time.Time `json:"start_date"`
+	EndDate     time.Time `json:"end_date"`
+	NewAssignment
+}
+
+type NewTestCaseSubmission struct {
+	InputData      string `json:"input_data" binding:"required"`
+	ExpectedResult string `json:"expected_result" binding:"required"`
+	submission
 }
 
 type TestCaseSubmission struct {
 	Id string `json:"id"`
-	submission
+	NewTestCaseSubmission
 }
 
+type NewAssignmentSubmission submission
+
 type AssignmentSubmission struct {
-	Id          string           `json:"id"`
-	Status      SubmissionStatus `json:"status"`
-	IsPublished bool             `json:"is_published"`
-	submission
+	Id     string           `json:"id"`
+	Status SubmissionStatus `json:"grading_status"`
+	NewAssignmentSubmission
 }
+
+type NewStudent person
 
 type Student struct {
 	Id string `json:"id"`
-	person
+	NewStudent
 }
 
 type StudentAnonymous struct {
 	Id          string `json:"id"`
 	AnonymousId string `json:"anonymous_id"`
-	person
 }
+
+type NewInstructor person
 
 type Instructor struct {
 	Id string `json:"id"`
-	person
+	NewInstructor
 }

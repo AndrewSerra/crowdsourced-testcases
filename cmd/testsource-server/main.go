@@ -8,6 +8,8 @@ package main
 import "github.com/gin-gonic/gin"
 
 func main() {
+	defer SafelyCloseDB()
+
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
@@ -15,6 +17,25 @@ func main() {
 			"message": "Hello World!",
 		})
 	})
+
+	courseGroup := router.Group("/courses")
+	{
+		courseGroup.POST("/roster", CreateRosterHandler)
+		courseGroup.POST("/", CreateCourseHandler)
+		courseGroup.GET("/:cid", GetCourseHandler)
+
+		assignmentGroup := courseGroup.Group("/:cid/assignments")
+		{
+			assignmentGroup.POST("/", CreateAssignmentHandler)
+			assignmentGroup.GET("/:aid", GetAssignmentHandler)
+			assignmentGroup.DELETE("/:aid", DeleteAssignmentHandler)
+		}
+	}
+
+	instructorGroup := router.Group("/instructors")
+	{
+		instructorGroup.POST("/", CreateInstructorHandler)
+	}
 
 	router.Run(":8080")
 }

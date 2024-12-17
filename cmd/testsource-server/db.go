@@ -7,7 +7,7 @@ package main
 
 import (
 	"database/sql"
-	"os"
+	"log"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -15,13 +15,19 @@ import (
 
 var db *sql.DB
 
+const (
+	FOREIGN_KEY_NO_EXIST_ERROR uint16 = 1452
+	DUPLICATE_ENTRY_ERROR      uint16 = 1062
+)
+
 func init() {
 	cfg := mysql.Config{
-		User:   os.Getenv("DBUSER"),
-		Passwd: os.Getenv("DBPASS"),
-		Net:    "tcp",
-		Addr:   "127.0.0.1:3310",
-		DBName: "csdb",
+		User:      "root",
+		Passwd:    "admin",
+		Net:       "tcp",
+		Addr:      "127.0.0.1:3310",
+		DBName:    "csdb",
+		ParseTime: true,
 	}
 
 	var err error
@@ -30,6 +36,10 @@ func init() {
 		panic(err)
 	}
 
+	if err = db.Ping(); err != nil {
+		panic(err)
+	}
+	log.Println("Connected to database.")
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
