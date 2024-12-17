@@ -1,0 +1,75 @@
+use csdb;
+
+create table if not exists students (
+	id int primary key auto_increment,
+    anon_name varchar(255) not null,
+    first_name varchar(255) not null,
+    last_name varchar(255) not null,
+	email varchar(255) not null,
+    email_verified tinyint(1) not null default 0,
+    created_at datetime not null default now(),
+
+    unique(email)
+);
+
+create table if not exists instructors (
+	id int primary key auto_increment,
+    first_name varchar(255) not null,
+    last_name varchar(255) not null,
+	email varchar(255) not null,
+    email_verified tinyint(1) not null default 0,
+    created_at datetime not null default now()
+);
+
+create table if not exists courses (
+	id int primary key auto_increment,
+    title varchar(255) not null,
+    owner_id int not null,
+    created_at datetime not null default now(),
+
+    constraint uc_course unique(title, owner_id),
+    foreign key (owner_id)
+		references instructors(id)
+);
+
+create table if not exists assignments (
+	id int primary key auto_increment,
+    title varchar(255) not null,
+    course_id int not null,
+    start_date datetime not null,
+    end_date datetime not null,
+    is_open tinyint(1) not null default 1,
+    is_published tinyint(1) not null default 0,
+    created_at datetime not null default now(),
+
+    constraint uc_course_assingment unique(title, course_id),
+    foreign key (course_id)
+		references courses(id)
+        on delete cascade
+);
+
+create table if not exists assignment_submissions (
+	id int primary key auto_increment,
+    course_id int not null,
+    owner_id int not null,
+    assignment_id int not null,
+    grading_status tinyint(1) not null default 0,
+    submitted_at datetime not null default now(),
+
+    foreign key (course_id)
+		references courses(id),
+	foreign key (owner_id)
+		references students(id),
+	foreign key (assignment_id)
+		references assignments(id)
+);
+
+create table if not exists testcase_submissions (
+	id int primary key auto_increment,
+    course_id int not null,
+    owner_id int not null,
+    assignment_id int not null,
+    input_data blob not null,
+    expected_result blob not null,
+    submitted_at datetime not null default now()
+);
