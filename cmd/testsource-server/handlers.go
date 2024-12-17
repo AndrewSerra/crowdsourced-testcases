@@ -60,6 +60,11 @@ func CreateAssignmentHandler(c *gin.Context) {
 					"error": fmt.Sprintf("course '%s' does not exist", assignment.CourseId),
 				})
 			}
+			if mysqlError.Number == DUPLICATE_ENTRY_ERROR {
+				c.JSON(http.StatusConflict, gin.H{
+					"error": fmt.Sprintf("assignment '%s' already exists", assignment.Name),
+				})
+			}
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
@@ -313,6 +318,11 @@ func CreateCourseHandler(c *gin.Context) {
 			if dbError.Number == FOREIGN_KEY_NO_EXIST_ERROR {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"error": fmt.Sprintf("instructor '%s' does not exist", course.OwnerId),
+				})
+			}
+			if dbError.Number == DUPLICATE_ENTRY_ERROR {
+				c.JSON(http.StatusConflict, gin.H{
+					"error": fmt.Sprintf("course '%s' already exists", course.Name),
 				})
 			}
 		} else {
