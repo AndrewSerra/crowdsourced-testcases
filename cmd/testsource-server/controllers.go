@@ -7,6 +7,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"time"
 )
@@ -217,16 +218,34 @@ func UpdateAssignment() {
 
 }
 
-func PublishAssignmentGrades(courseid int, assignmentid int) error {
+func publishAssignmentGrades(courseid int, assignmentid int, value int) (int, error) {
 	db := GetDB()
 
-	_, err := db.Exec("UPDATE assignments SET is_published = 1 WHERE id = ? AND course_id = ?", assignmentid, courseid)
-	if err != nil {
-		log.Println(err)
-		return err
+	if value < 0 || value > 1 {
+		return -1, errors.New("invalid value for is_published")
 	}
 
-	return nil
+	result, err := db.Exec("UPDATE assignments SET is_published = ? WHERE id = ? AND course_id = ?", value, assignmentid, courseid)
+	if err != nil {
+		log.Println(err)
+		return -1, err
+	}
+
+	rowCount, err := result.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return -1, err
+	}
+
+	return int(rowCount), nil
+}
+
+func SetPublishedAssignment(courseid int, assignmentid int) (int, error) {
+	return publishAssignmentGrades(courseid, assignmentid, 1)
+}
+
+func ClearPublishedAssignment(courseid int, assignmentid int) (int, error) {
+	return publishAssignmentGrades(courseid, assignmentid, 0)
 }
 
 // Submission

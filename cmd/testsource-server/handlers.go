@@ -154,7 +154,7 @@ func DeleteAssignmentHandler(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func PublishAssignmentGradesHandler(c *gin.Context) {
+func AssignmentActionsHandler(c *gin.Context) {
 	param_cid := c.Params.ByName("cid")
 	param_aid := c.Params.ByName("aid")
 
@@ -165,7 +165,6 @@ func PublishAssignmentGradesHandler(c *gin.Context) {
 
 	cid, err := strconv.Atoi(param_cid)
 	if err != nil {
-		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -174,22 +173,42 @@ func PublishAssignmentGradesHandler(c *gin.Context) {
 
 	aid, err := strconv.Atoi(param_aid)
 	if err != nil {
-		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	err = PublishAssignmentGrades(cid, aid)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	action := c.Param("action")[1:]
 
-	c.Status(http.StatusOK)
+	switch action {
+	case "publish":
+		rowCount, err := SetPublishedAssignment(cid, aid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+		} else if rowCount == 0 {
+			c.Status(http.StatusNoContent)
+		} else {
+			c.Status(http.StatusOK)
+		}
+	case "unpublish":
+		rowCount, err := ClearPublishedAssignment(cid, aid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+		} else if rowCount == 0 {
+			c.Status(http.StatusNoContent)
+		} else {
+			c.Status(http.StatusOK)
+		}
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": fmt.Sprintf("unknown action '%s'", action),
+		})
+	}
 }
 
 // Instructor
