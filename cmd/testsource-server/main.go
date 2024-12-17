@@ -23,6 +23,7 @@ func main() {
 		courseGroup.POST("/roster", CreateRosterHandler)
 		courseGroup.POST("/", CreateCourseHandler)
 		courseGroup.GET("/:cid", GetCourseHandler)
+		courseGroup.DELETE("/:cid", DeleteCourseHandler)
 
 		assignmentGroup := courseGroup.Group("/:cid/assignments")
 		{

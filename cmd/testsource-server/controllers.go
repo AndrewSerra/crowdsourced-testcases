@@ -148,6 +148,24 @@ func GetCourse(id int) (*Course, error) {
 	return &course, nil
 }
 
+func DeleteCourse(courseid int) (int, error) {
+	db := GetDB()
+
+	result, err := db.Exec("DELETE FROM courses WHERE id = ?", courseid)
+	if err != nil {
+		log.Println(err)
+		return -1, err
+	}
+
+	rowCount, err := result.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return -1, err
+	}
+
+	return int(rowCount), nil
+}
+
 // Assignment
 func CreateAssignment(assignment NewAssignment) (int, error) {
 	db := GetDB()
@@ -203,16 +221,21 @@ func GetAssignment(courseid int, assignmentid int) (*Assignment, error) {
 	return &assignment, nil
 }
 
-func DeleteAssignment(courseid int, assignmentid int) error {
+func DeleteAssignment(courseid int, assignmentid int) (int, error) {
 	db := GetDB()
 
-	_, err := db.Exec("DELETE FROM assignments WHERE id = ? AND course_id = ?", assignmentid, courseid)
+	result, err := db.Exec("DELETE FROM assignments WHERE id = ? AND course_id = ?", assignmentid, courseid)
 	if err != nil {
 		log.Println(err)
-		return err
+		return -1, err
 	}
 
-	return nil
+	rowCount, err := result.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return -1, err
+	}
+	return int(rowCount), nil
 }
 
 func updateAssignment(cid int, aid int, val int, col string) (int, error) {

@@ -143,11 +143,14 @@ func DeleteAssignmentHandler(c *gin.Context) {
 		return
 	}
 
-	err = DeleteAssignment(cid, aid)
+	rowCount, err := DeleteAssignment(cid, aid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
+	} else if rowCount == 0 {
+		c.Status(http.StatusNoContent)
 		return
 	}
 
@@ -328,6 +331,37 @@ func GetCourseHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, course)
+}
+
+func DeleteCourseHandler(c *gin.Context) {
+	param_cid := c.Params.ByName("cid")
+
+	if param_cid == "" {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	cid, err := strconv.Atoi(param_cid)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	rowCount, err := DeleteCourse(cid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	} else if rowCount == 0 {
+		c.Status(http.StatusNoContent)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
 
 func CreateRosterHandler(c *gin.Context) {
