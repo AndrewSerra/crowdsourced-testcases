@@ -4,7 +4,7 @@
  * Copyright © 2024 Andrew Serra <andy@serra.us>
  */
 
-package main
+package edit
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 )
 
 // editCmd represents the edit command
-var editCmd = &cobra.Command{
+var EditCmd = &cobra.Command{
 	Use:   "edit",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
@@ -27,6 +27,6 @@ to quickly create a Cobra application.`,
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(editCmd)
-}
+// func init() {
+// 	rootCmd.AddCommand(editCmd)
+// }

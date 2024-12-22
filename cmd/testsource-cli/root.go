@@ -9,6 +9,11 @@ package main
 import (
 	"os"
 
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/edit"
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/new"
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/profile"
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/publish"
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/stats"
 	"github.com/spf13/cobra"
 )
 
@@ -25,4 +30,12 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func init() {
+	rootCmd.AddCommand(edit.EditCmd)
+	rootCmd.AddCommand(new.NewCmd)
+	rootCmd.AddCommand(profile.ProfileCmd)
+	rootCmd.AddCommand(publish.PublishCmd)
+	rootCmd.AddCommand(stats.StatsCmd)
 }
