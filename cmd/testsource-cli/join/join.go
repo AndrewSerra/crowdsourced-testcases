@@ -7,7 +7,9 @@ package join
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/AndrewSerra/crowdsourced-testcases/internal/api"
 	"github.com/spf13/cobra"
 )
 
@@ -23,18 +25,33 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("join called")
+		join_tk, _ := cmd.Flags().GetString("token")
+		courseid, _ := cmd.Flags().GetString("courseid")
+
+		if join_tk == "" {
+			fmt.Println("join token is required")
+			os.Exit(1)
+		}
+
+		if courseid == "" {
+			fmt.Println("courseid is required")
+			os.Exit(1)
+		}
+
+		err := api.AcceptStudentForCourse(courseid, join_tk)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// TODO: Store locally
 	},
 }
 
 func init() {
+	JoinCmd.Flags().StringP("courseid", "c", "", "Course id to join")
+	JoinCmd.Flags().StringP("token", "t", "", "Token to join course")
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// joinCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// joinCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	JoinCmd.MarkFlagRequired("courseid")
+	JoinCmd.MarkFlagRequired("token")
 }
