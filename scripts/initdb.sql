@@ -25,11 +25,25 @@ create table if not exists courses (
 	id int primary key auto_increment,
     title varchar(255) not null,
     owner_id int not null,
+    join_tk varchar(255) not null,
     created_at datetime not null default now(),
 
     constraint uc_course unique(title, owner_id),
     foreign key (owner_id)
 		references instructors(id)
+);
+
+create table if not exists course_registration (
+	id int primary key auto_increment,
+    course_id int not null,
+    student_id int not null,
+    created_at datetime not null default now(),
+
+    constraint uc_registration unique(course_id, student_id),
+    foreign key (course_id)
+		references courses(id),
+	foreign key (student_id)
+		references students(id)
 );
 
 create table if not exists assignments (
