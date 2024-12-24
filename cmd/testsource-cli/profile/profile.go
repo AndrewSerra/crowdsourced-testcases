@@ -7,6 +7,8 @@
 package profile
 
 import (
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/profile/delete"
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/profile/list"
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/profile/new"
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/profile/use"
 	"github.com/spf13/cobra"
@@ -21,6 +23,8 @@ var ProfileCmd = &cobra.Command{
 }
 
 func init() {
+	ProfileCmd.AddCommand(delete.DeleteCmd)
 	ProfileCmd.AddCommand(new.NewCmd)
 	ProfileCmd.AddCommand(use.UseCmd)
+	ProfileCmd.AddCommand(list.ListCmd)
 }

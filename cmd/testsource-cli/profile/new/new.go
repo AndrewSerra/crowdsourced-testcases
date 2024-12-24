@@ -9,6 +9,7 @@ package new
 import (
 	"fmt"
 
+	datastorage "github.com/AndrewSerra/crowdsourced-testcases/internal/data-storage"
 	"github.com/spf13/cobra"
 )
 
@@ -23,19 +24,32 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("new called")
 		name, _ := cmd.Flags().GetString("name")
 		email, _ := cmd.Flags().GetString("email")
 
-		var profile map[string]string = map[string]string{
-			"name":  name,
-			"email": email,
+		isUsed, err := datastorage.IsEmailUsedInProfile(email)
+
+		if err != nil {
+			fmt.Println(err)
+			return
 		}
 
-		fmt.Printf("profile: %+v\n", profile)
-		// TODO:
-		// 1 - check if profile exists (email)
-		// 2 - create profile if not exist
+		if isUsed {
+			fmt.Println("Email already in use")
+			return
+		}
+
+		err = datastorage.CreateNewUserProfile(name, datastorage.UserProfile{
+			Id:    name,
+			Email: email,
+		})
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Printf("Profile '%s' created\n", name)
 	},
 }
 
