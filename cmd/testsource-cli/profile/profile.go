@@ -7,8 +7,8 @@
 package profile
 
 import (
-	"fmt"
-
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/profile/new"
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/profile/use"
 	"github.com/spf13/cobra"
 )
 
@@ -17,8 +17,10 @@ var ProfileCmd = &cobra.Command{
 	Use:   "profile",
 	Short: "Manages profiles for the CLI operations",
 	Long:  `Different emails can be used as different profiles for the CLI operations.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("profile called")
+	Run:   nil,
+}
 
-	},
+func init() {
+	ProfileCmd.AddCommand(new.NewCmd)
+	ProfileCmd.AddCommand(use.UseCmd)
 }
