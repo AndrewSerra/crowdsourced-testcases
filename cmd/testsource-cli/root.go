@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/edit"
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/join"
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/new"
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/profile"
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/publish"
@@ -34,6 +35,7 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(edit.EditCmd)
+	rootCmd.AddCommand(join.JoinCmd)
 	rootCmd.AddCommand(new.NewCmd)
 	rootCmd.AddCommand(profile.ProfileCmd)
 	rootCmd.AddCommand(publish.PublishCmd)
