@@ -37,6 +37,7 @@ create table if not exists course_registration (
 	id int primary key auto_increment,
     course_id int not null,
     student_id int not null,
+    entry_code binary(16),
     created_at datetime not null default now(),
 
     constraint uc_registration unique(course_id, student_id),
@@ -45,6 +46,10 @@ create table if not exists course_registration (
 	foreign key (student_id)
 		references students(id)
 );
+
+create trigger register_code_set
+	before insert on course_registration
+	for each row set new.entry_code = uuid_to_bin(uuid());
 
 create table if not exists assignments (
 	id int primary key auto_increment,
