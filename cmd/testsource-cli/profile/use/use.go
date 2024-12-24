@@ -9,6 +9,7 @@ package use
 import (
 	"fmt"
 
+	datastorage "github.com/AndrewSerra/crowdsourced-testcases/internal/data-storage"
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +25,15 @@ var UseCmd = &cobra.Command{
  to quickly create a Cobra application.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("use called")
+		name := args[0]
+
+		currentProfile := datastorage.GetActiveProfileName()
+		err := datastorage.SetNewActiveProfileState(name)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Printf("Switched from %s -> %s\n", currentProfile, name)
 	},
 }

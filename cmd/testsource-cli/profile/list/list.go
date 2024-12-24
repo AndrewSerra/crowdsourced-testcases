@@ -8,7 +8,10 @@ package list
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
+	datastorage "github.com/AndrewSerra/crowdsourced-testcases/internal/data-storage"
 	"github.com/spf13/cobra"
 )
 
@@ -23,6 +26,30 @@ var ListCmd = &cobra.Command{
  This application is a tool to generate the needed files
  to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("list called")
+		profiles, err := datastorage.GetUserProfileList()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		activeName := datastorage.GetActiveProfileName()
+		headerStr := "Available Profiles:"
+		headerLen := len(headerStr)
+
+		if len(profiles) == 0 {
+			fmt.Println("No profiles found")
+			return
+		}
+
+		fmt.Println(headerStr)
+		fmt.Println(strings.Repeat("-", headerLen))
+
+		for _, profile := range profiles {
+			if profile == activeName {
+				fmt.Printf("  * %s (active)\n", profile)
+				continue
+			}
+			fmt.Printf("  * %s\n", profile)
+		}
 	},
 }
