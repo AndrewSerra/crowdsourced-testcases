@@ -2,7 +2,7 @@ use csdb;
 
 create table if not exists students (
 	id int primary key auto_increment,
-    anon_name varchar(255) not null,
+    anon_name varchar(255),
     first_name varchar(255) not null,
     last_name varchar(255) not null,
 	email varchar(255) not null,
@@ -11,6 +11,10 @@ create table if not exists students (
 
     unique(email)
 );
+
+create trigger student_anon_name_set
+	before insert on students
+	for each row set new.anon_name = uuid_to_bin(uuid());
 
 create table if not exists instructors (
 	id int primary key auto_increment,
