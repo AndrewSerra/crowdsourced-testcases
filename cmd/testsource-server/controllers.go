@@ -35,7 +35,7 @@ func CreateStudent(student NewStudent) (int, error) {
 	return int(insertedId), nil
 }
 
-func CreateStudentBatch(students []NewStudent) error {
+func CreateStudentBatch(courseid int, students []NewStudent) error {
 	db := GetDB()
 	tx, err := db.Begin()
 	if err != nil {
@@ -44,8 +44,25 @@ func CreateStudentBatch(students []NewStudent) error {
 	}
 
 	for _, student := range students {
-		_, err := tx.Exec("INSERT INTO students (first_name, last_name, email) VALUES (?, ?, ?)",
+		result, err := tx.Exec("INSERT INTO students (first_name, last_name, email) VALUES (?, ?, ?)",
 			student.FirstName, student.LastName, student.Email)
+
+		if err != nil {
+			log.Println(err)
+			tx.Rollback()
+			return err
+		}
+
+		sid, err := result.LastInsertId()
+
+		if err != nil {
+			log.Println(err)
+			tx.Rollback()
+			return err
+		}
+
+		_, err = tx.Exec("INSERT INTO course_registration (course_id, student_id) VALUES (?, ?)",
+			courseid, sid)
 
 		if err != nil {
 			log.Println(err)

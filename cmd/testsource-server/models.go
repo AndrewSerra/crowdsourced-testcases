@@ -35,7 +35,8 @@ type NewCourse struct {
 	OwnerId string `json:"owner_id" binding:"required"`
 }
 type Course struct {
-	Id string `json:"id"`
+	Id    string `json:"id"`
+	Token string `json:"join_tk"`
 	NewCourse
 }
 

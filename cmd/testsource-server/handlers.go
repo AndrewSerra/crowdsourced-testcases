@@ -403,6 +403,22 @@ func DeleteCourseHandler(c *gin.Context) {
 }
 
 func CreateRosterHandler(c *gin.Context) {
+	param_cid := c.Params.ByName("cid")
+
+	if param_cid == "" {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	cid, err := strconv.Atoi(param_cid)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	var students []NewStudent
 
 	body, err := io.ReadAll(c.Request.Body)
@@ -419,7 +435,7 @@ func CreateRosterHandler(c *gin.Context) {
 		return
 	}
 
-	err = CreateStudentBatch(students)
+	err = CreateStudentBatch(cid, students)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

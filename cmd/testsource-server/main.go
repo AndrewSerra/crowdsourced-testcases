@@ -20,10 +20,10 @@ func main() {
 
 	courseGroup := router.Group("/courses")
 	{
-		courseGroup.POST("/roster", CreateRosterHandler)
 		courseGroup.POST("/", CreateCourseHandler)
 		courseGroup.GET("/:cid", GetCourseHandler)
 		courseGroup.DELETE("/:cid", DeleteCourseHandler)
+		courseGroup.POST("/:cid/roster", CreateRosterHandler)
 
 		assignmentGroup := courseGroup.Group("/:cid/assignments")
 		{

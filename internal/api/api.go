@@ -119,6 +119,30 @@ func AcceptStudentForCourse(courseId string, token string) error {
 	return nil
 }
 
+func CreateCourseStudentRoster(courseid int, students []NewStudent) error {
+	if len(students) == 0 {
+		return fmt.Errorf("at least one student is required")
+	}
+
+	body, err := generateRequestBodyJSON(students)
+	if err != nil {
+		return err
+	}
+
+	res, err := http.Post(fmt.Sprintf("%s/courses/%d/roster", url, courseid), "application/json", body)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		fmt.Println(res)
+		return fmt.Errorf("failed to create roster")
+	}
+
+	return nil
+}
+
 func generateRequestBodyJSON(data interface{}) (*bytes.Buffer, error) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
