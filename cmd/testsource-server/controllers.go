@@ -90,6 +90,21 @@ func GetStudent(id string) (*Student, error) {
 	return &student, nil
 }
 
+func GetStudentByEmail(email string) (*Student, error) {
+	var student Student
+
+	db := GetDB()
+	row := db.QueryRow("SELECT id, first_name, last_name, email FROM students WHERE email = ?", email)
+	if err := row.Scan(&student.Id, &student.FirstName, &student.LastName, &student.Email); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &student, nil
+}
+
 func GetAnonymousStudent(id string) (*StudentAnonymous, error) {
 	db := GetDB()
 
@@ -125,6 +140,21 @@ func CreateInstructor(instructor NewInstructor) (int, error) {
 	}
 
 	return int(insertedId), nil
+}
+
+func GetInstructorByEmail(email string) (*Instructor, error) {
+	var instructor Instructor
+
+	db := GetDB()
+	row := db.QueryRow("SELECT id, first_name, last_name, email FROM instructors WHERE email = ?", email)
+	if err := row.Scan(&instructor.Id, &instructor.FirstName, &instructor.LastName, &instructor.Email); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &instructor, nil
 }
 
 // Course
@@ -330,14 +360,14 @@ func ClearOpenAssignment(courseid int, assignmentid int) (int, error) {
 }
 
 // Submission
-func createSubmission() {
+// func createSubmission() {
 
-}
+// }
 
-func CreateTestCaseSubmission() {
+// func CreateTestCaseSubmission() {
 
-}
+// }
 
-func CreateAssignmentSubmission() {
+// func CreateAssignmentSubmission() {
 
-}
+// }

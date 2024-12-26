@@ -38,6 +38,12 @@ func main() {
 	instructorGroup := router.Group("/instructors")
 	{
 		instructorGroup.POST("/", CreateInstructorHandler)
+		instructorGroup.GET("/", GetInstructorHandler)
+	}
+
+	studentGroup := router.Group("/students")
+	{
+		studentGroup.GET("/", GetStudentHandler)
 	}
 
 	router.Run(":8080")

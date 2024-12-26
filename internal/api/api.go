@@ -20,6 +20,13 @@ type createResponseBody struct {
 	Id int `json:"id" binding:"required"`
 }
 
+type persontype string
+
+const (
+	INSTRUCTOR persontype = "instructor"
+	STUDENT    persontype = "student"
+)
+
 func CreateCourseForInstructor(title string, ownerId string) (int, error) {
 	data := map[string]interface{}{
 		"name":     title,
@@ -141,6 +148,36 @@ func CreateCourseStudentRoster(courseid int, students []NewStudent) error {
 	}
 
 	return nil
+}
+
+func GetInstructorByEmail(email string) (*Person, error) {
+	return getPersonByEmail(email, INSTRUCTOR)
+}
+
+func GetStudentByEmail(email string) (*Person, error) {
+	return getPersonByEmail(email, STUDENT)
+}
+
+func getPersonByEmail(email string, t persontype) (*Person, error) {
+	resp, err := http.Get(fmt.Sprintf("%s/%ss?email=%s", url, t, email))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNoContent {
+		return nil, nil
+	} else if resp.StatusCode == http.StatusOK {
+		var person Person
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		json.Unmarshal(body, &person)
+		return &person, nil
+	} else {
+		return nil, fmt.Errorf("unexpected error: %s", resp.Status)
+	}
 }
 
 func generateRequestBodyJSON(data interface{}) (*bytes.Buffer, error) {

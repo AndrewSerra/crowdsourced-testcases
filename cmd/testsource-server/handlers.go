@@ -290,6 +290,28 @@ func CreateInstructorHandler(c *gin.Context) {
 	})
 }
 
+func GetInstructorHandler(c *gin.Context) {
+	email := c.Query("email")
+
+	if email == "" {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	instructor, err := GetInstructorByEmail(email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	} else if instructor == nil {
+		c.JSON(http.StatusNoContent, gin.H{
+			"error": "instructor not found",
+		})
+		return
+	}
+}
+
 // Course
 func CreateCourseHandler(c *gin.Context) {
 	var course NewCourse
@@ -442,4 +464,27 @@ func CreateRosterHandler(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+// Student
+func GetStudentHandler(c *gin.Context) {
+	email := c.Query("email")
+
+	if email == "" {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	instructor, err := GetStudentByEmail(email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	} else if instructor == nil {
+		c.JSON(http.StatusNoContent, gin.H{
+			"error": "student not found",
+		})
+		return
+	}
 }

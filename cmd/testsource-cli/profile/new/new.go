@@ -9,6 +9,7 @@ package new
 import (
 	"fmt"
 
+	"github.com/AndrewSerra/crowdsourced-testcases/internal/api"
 	datastorage "github.com/AndrewSerra/crowdsourced-testcases/internal/data-storage"
 	"github.com/spf13/cobra"
 )
@@ -26,6 +27,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		email, _ := cmd.Flags().GetString("email")
+		// token, _ := cmd.Flags().GetString("token")
 
 		isUsed, err := datastorage.IsEmailUsedInProfile(email)
 
@@ -37,6 +39,32 @@ to quickly create a Cobra application.`,
 		if isUsed {
 			fmt.Println("Email already in use")
 			return
+		}
+
+		isInstructor, _ := cmd.Flags().GetBool("instructor")
+
+		if isInstructor {
+			instructor, err := api.GetInstructorByEmail(email)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			if instructor == nil {
+				fmt.Println("Instructor not found")
+				return
+			}
+		} else {
+			student, err := api.GetStudentByEmail(email)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			if student == nil {
+				fmt.Println("Student not found")
+				return
+			}
 		}
 
 		err = datastorage.CreateNewUserProfile(name, datastorage.UserProfile{
@@ -56,7 +84,10 @@ to quickly create a Cobra application.`,
 func init() {
 	NewCmd.Flags().StringP("name", "n", "", "Name of the profile")
 	NewCmd.Flags().StringP("email", "e", "", "Email of the profile")
+	NewCmd.Flags().StringP("token", "t", "", "Token of the profile")
+	NewCmd.Flags().Bool("instructor", false, "Treat profile as instructor")
 
 	NewCmd.MarkFlagRequired("name")
 	NewCmd.MarkFlagRequired("email")
+	NewCmd.MarkFlagRequired("token")
 }
