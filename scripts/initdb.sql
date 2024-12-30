@@ -6,7 +6,7 @@ create table if not exists students (
     first_name varchar(255) not null,
     last_name varchar(255) not null,
 	email varchar(255) not null,
-    email_verified tinyint(1) not null default 0,
+    email_verified tinyint not null default 0,
     created_at datetime not null default now(),
 
     unique(email)
@@ -21,7 +21,7 @@ create table if not exists instructors (
     first_name varchar(255) not null,
     last_name varchar(255) not null,
 	email varchar(255) not null,
-    email_verified tinyint(1) not null default 0,
+    email_verified tinyint not null default 0,
     created_at datetime not null default now()
 );
 
@@ -42,6 +42,7 @@ create table if not exists course_registration (
     course_id int not null,
     student_id int not null,
     entry_code binary(16),
+    is_registered tinyint not null default 0,
     created_at datetime not null default now(),
 
     constraint uc_registration unique(course_id, student_id),
@@ -61,8 +62,8 @@ create table if not exists assignments (
     course_id int not null,
     start_date datetime not null,
     end_date datetime not null,
-    is_open tinyint(1) not null default 1,
-    is_published tinyint(1) not null default 0,
+    is_open tinyint not null default 1,
+    is_published tinyint not null default 0,
     created_at datetime not null default now(),
 
     constraint uc_course_assingment unique(title, course_id),
@@ -76,7 +77,7 @@ create table if not exists assignment_submissions (
     course_id int not null,
     owner_id int not null,
     assignment_id int not null,
-    grading_status tinyint(1) not null default 0,
+    grading_status tinyint not null default 0,
     submitted_at datetime not null default now(),
 
     foreign key (course_id)
