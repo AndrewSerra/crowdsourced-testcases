@@ -18,6 +18,10 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+const (
+	TOKEN_HEADER = "X-TestSource-Token"
+)
+
 // Assignment
 func CreateAssignmentHandler(c *gin.Context) {
 	var courseUri struct {
@@ -360,6 +364,15 @@ func CreateCourseHandler(c *gin.Context) {
 	})
 }
 
+/*************  ✨ Codeium Command ⭐  *************/
+// GetCourseHandler handles the HTTP GET request to retrieve a course by its ID.
+// The course ID is extracted from the URL parameters. If the course ID is missing
+// or invalid, it responds with a Bad Request status. If the course is not found,
+// it responds with a Not Found status. On success, it returns the course details
+// in JSON format with an OK status. If an internal error occurs, it responds with
+// an Internal Server Error status.
+
+/******  7f0c1da1-b1b9-429a-a51f-17c0eefacefd  *******/
 func GetCourseHandler(c *gin.Context) {
 	param_cid := c.Params.ByName("cid")
 
@@ -460,6 +473,68 @@ func CreateRosterHandler(c *gin.Context) {
 	err = CreateStudentBatch(cid, students)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func ApproveCourseStudentRegistrationHandler(c *gin.Context) {
+	param_cid := c.Params.ByName("cid")
+	param_sid := c.Params.ByName("sid")
+
+	if param_cid == "" {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	cid, err := strconv.Atoi(param_cid)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	if param_sid == "" {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	sid, err := strconv.Atoi(param_sid)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	body, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	var code struct {
+		EntryCode string `json:"entry_code" binding:"required"`
+	}
+
+	err = json.Unmarshal(body, &code)
+	if err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	// err = CompleteRegisterationToCourse(cid, token, code.EntryCode)
+	isFullfilled, err := CompleteRegisterationToCourse(cid, sid, code.EntryCode)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+
+	if !isFullfilled {
+		c.Status(http.StatusNoContent)
 		return
 	}
 

@@ -213,6 +213,40 @@ func DeleteCourse(courseid int) (int, error) {
 	return int(rowCount), nil
 }
 
+func CompleteRegisterationToCourse(courseId int, studentId int, entryCode string) (bool, error) {
+	db := GetDB()
+
+	// if token == "" {
+	// 	return fmt.Errorf("token is required")
+	// }
+
+	if entryCode == "" {
+		return false, fmt.Errorf("entryCode is required")
+	}
+
+	res, err := db.Exec(
+		"UPDATE course_registration SET is_registered = 1 WHERE course_id = ? AND student_id = ? AND entry_code = uuid_to_bin(?)",
+		courseId, studentId, entryCode)
+
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+
+	affected, err := res.RowsAffected()
+
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+
+	if affected == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 // Assignment
 func CreateAssignment(assignment NewAssignment) (int, error) {
 	db := GetDB()

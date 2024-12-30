@@ -25,6 +25,11 @@ func main() {
 		courseGroup.DELETE("/:cid", DeleteCourseHandler)
 		courseGroup.POST("/:cid/roster", CreateRosterHandler)
 
+		courseStudentGroup := courseGroup.Group("/:cid/students")
+		{
+			courseStudentGroup.POST("/:sid/accept", ApproveCourseStudentRegistrationHandler)
+		}
+
 		assignmentGroup := courseGroup.Group("/:cid/assignments")
 		{
 			assignmentGroup.POST("/", CreateAssignmentHandler)
