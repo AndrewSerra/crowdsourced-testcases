@@ -49,6 +49,7 @@ func main() {
 	studentGroup := router.Group("/students")
 	{
 		studentGroup.GET("/", GetStudentHandler)
+		studentGroup.GET("/:sid/verify", VerifyStudentHandler)
 	}
 
 	router.Run(":8080")

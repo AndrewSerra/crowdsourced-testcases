@@ -25,7 +25,7 @@ const (
 // Assignment
 func CreateAssignmentHandler(c *gin.Context) {
 	var courseUri struct {
-		CourseId string `uri:"cid"`
+		CourseId int `uri:"cid"`
 	}
 	var assignment NewAssignment
 
@@ -534,7 +534,7 @@ func ApproveCourseStudentRegistrationHandler(c *gin.Context) {
 	}
 
 	if !isFullfilled {
-		c.Status(http.StatusNoContent)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -550,16 +550,46 @@ func GetStudentHandler(c *gin.Context) {
 		return
 	}
 
-	instructor, err := GetStudentByEmail(email)
+	student, err := GetStudentByEmail(email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
-	} else if instructor == nil {
+	} else if student == nil {
 		c.JSON(http.StatusNoContent, gin.H{
 			"error": "student not found",
 		})
 		return
+	} else {
+		c.JSON(http.StatusOK, student)
+	}
+}
+
+func VerifyStudentHandler(c *gin.Context) {
+	param_sid := c.Params.ByName("sid")
+
+	if param_sid == "" {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	sid, err := strconv.Atoi(param_sid)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	isVerified, err := VerifyStudentEmail(sid)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	} else if !isVerified {
+		c.Status(http.StatusNoContent)
+	} else {
+		c.Status(http.StatusOK)
 	}
 }

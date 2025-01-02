@@ -100,29 +100,43 @@ func CreateAssignmentForCourse(title string, courseId string, duration struct{ S
 	return jsonRespBody.Id, nil
 }
 
-func AcceptStudentForCourse(courseId string, token string) error {
+func AcceptStudentForCourse(courseId int, studentId int, token string) error {
 	if token == "" {
 		return fmt.Errorf("token is required")
 	}
 
-	if courseId == "" {
+	if courseId == -1 {
 		return fmt.Errorf("courseId is required")
 	}
 
-	request, err := http.NewRequest("POST", fmt.Sprintf("%s/courses/%s/accept", url, courseId), nil)
+	if studentId == -1 {
+		return fmt.Errorf("studentId is required")
+	}
+
+	body, err := generateRequestBodyJSON(map[string]string{
+		"entry_code": token,
+	})
 	if err != nil {
 		return err
 	}
-	request.Header.Set("X-TestSource-Token", token)
 
-	resp, err := http.DefaultClient.Do(request)
+	resp, err := http.Post(fmt.Sprintf("%s/courses/%d/students/%d/accept", url, courseId, studentId), "application/json", body)
+
+	// request, err := http.NewRequest("POST", fmt.Sprintf("%s/courses/%d/students/%d/accept", url, courseId, studentId), nil)
+	// if err != nil {
+	// 	return err
+	// }
+	// request.Header.Set("X-TestSource-Token", token)
+
+	// resp, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	// TODO: Do error handling
-
+	if resp.StatusCode == http.StatusBadRequest {
+		return fmt.Errorf("email is not verified for account")
+	}
 	return nil
 }
 
@@ -173,7 +187,10 @@ func getPersonByEmail(email string, t persontype) (*Person, error) {
 		if err != nil {
 			return nil, err
 		}
-		json.Unmarshal(body, &person)
+		err = json.Unmarshal(body, &person)
+		if err != nil {
+			return nil, err
+		}
 		return &person, nil
 	} else {
 		return nil, fmt.Errorf("unexpected error: %s", resp.Status)

@@ -7,9 +7,9 @@ package join
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/AndrewSerra/crowdsourced-testcases/internal/api"
+	datastorage "github.com/AndrewSerra/crowdsourced-testcases/internal/data-storage"
 	"github.com/spf13/cobra"
 )
 
@@ -24,32 +24,38 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("join called")
 		join_tk, _ := cmd.Flags().GetString("token")
-		courseid, _ := cmd.Flags().GetString("courseid")
+		courseid, _ := cmd.Flags().GetInt("courseid")
 
 		if join_tk == "" {
 			fmt.Println("join token is required")
-			os.Exit(1)
+			return
 		}
 
-		if courseid == "" {
+		if courseid == -1 {
 			fmt.Println("courseid is required")
-			os.Exit(1)
+			return
 		}
 
-		err := api.AcceptStudentForCourse(courseid, join_tk)
+		profile, err := datastorage.GetActiveUserProfile()
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			return
 		}
 
+		err = api.AcceptStudentForCourse(courseid, profile.Id, join_tk)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Println("Successfully joined course")
 		// TODO: Store locally
 	},
 }
 
 func init() {
-	JoinCmd.Flags().StringP("courseid", "c", "", "Course id to join")
+	JoinCmd.Flags().IntP("courseid", "c", -1, "Course id to join")
 	JoinCmd.Flags().StringP("token", "t", "", "Token to join course")
 
 	JoinCmd.MarkFlagRequired("courseid")

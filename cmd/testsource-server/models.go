@@ -17,8 +17,8 @@ const (
 
 // Base structs
 type submission struct {
-	CourseId     string `uri:"cid" json:"course_id" binding:"required"`
-	OwnerId      string `json:"owner_id" binding:"required"`
+	CourseId     int    `uri:"cid" json:"course_id" binding:"required"`
+	OwnerId      int    `json:"owner_id" binding:"required"`
 	AssignmentId string `uri:"aid" json:"assignment_id" binding:"required"`
 	// SubmittedAt string `json:"submitted_at"`     // Maybe add it later for offline submission?
 }
@@ -35,20 +35,20 @@ type NewCourse struct {
 	OwnerId string `json:"owner_id" binding:"required"`
 }
 type Course struct {
-	Id    string `json:"id"`
+	Id    int    `json:"id"`
 	Token string `json:"join_tk"`
 	NewCourse
 }
 
 type NewAssignment struct {
-	CourseId  string `json:"course_id"`
+	CourseId  int    `json:"course_id"`
 	Name      string `json:"name" binding:"required"`
 	StartDate string `json:"start_date" binding:"required"`
 	EndDate   string `json:"end_date" binding:"required"`
 }
 
 type Assignment struct {
-	Id          string    `json:"id"`
+	Id          int       `json:"id"`
 	IsOpen      bool      `json:"is_open"`
 	IsPublished bool      `json:"is_published"`
 	StartDate   time.Time `json:"start_date"`
@@ -63,14 +63,14 @@ type NewTestCaseSubmission struct {
 }
 
 type TestCaseSubmission struct {
-	Id string `json:"id"`
+	Id int `json:"id"`
 	NewTestCaseSubmission
 }
 
 type NewAssignmentSubmission submission
 
 type AssignmentSubmission struct {
-	Id     string           `json:"id"`
+	Id     int              `json:"id"`
 	Status SubmissionStatus `json:"grading_status"`
 	NewAssignmentSubmission
 }
@@ -78,18 +78,18 @@ type AssignmentSubmission struct {
 type NewStudent person
 
 type Student struct {
-	Id string `json:"id"`
+	Id int `json:"id"`
 	NewStudent
 }
 
 type StudentAnonymous struct {
-	Id          string `json:"id"`
+	Id          int    `json:"id"`
 	AnonymousId string `json:"anonymous_id"`
 }
 
 type NewInstructor person
 
 type Instructor struct {
-	Id string `json:"id"`
+	Id int `json:"id"`
 	NewInstructor
 }

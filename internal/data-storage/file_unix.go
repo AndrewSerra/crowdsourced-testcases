@@ -26,8 +26,10 @@ type systemState struct {
 }
 
 type UserProfile struct {
-	Id    string `json:"id,omitempty"`
-	Email string `json:"email,omitempty"`
+	Id        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
 }
 
 var state *systemState
@@ -132,6 +134,7 @@ func GetActiveUserProfile() (*UserProfile, error) {
 }
 
 func CreateNewUserProfile(profileName string, profile UserProfile) error {
+	fmt.Println(profile)
 	userProfiles, err := getStoredProfiles()
 	if err != nil {
 		return err
@@ -199,9 +202,9 @@ func SetNewActiveProfileState(profile string) error {
 		return err
 	}
 
-	for _, p := range userProfiles {
-		if p.Id == profile {
-			state.CurrentProfile = p.Id
+	for k, _ := range userProfiles {
+		if k == profile {
+			state.CurrentProfile = k
 			saveState()
 			return nil
 		}

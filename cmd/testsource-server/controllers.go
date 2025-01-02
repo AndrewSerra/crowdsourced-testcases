@@ -120,6 +120,28 @@ func GetAnonymousStudent(id string) (*StudentAnonymous, error) {
 	return &student, nil
 }
 
+func VerifyStudentEmail(id int) (bool, error) {
+	db := GetDB()
+
+	result, err := db.Exec("UPDATE students SET email_verified = 1 WHERE id = ?;", id)
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+
+	rowCount, err := result.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+
+	if rowCount == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 // Instructor
 func CreateInstructor(instructor NewInstructor) (int, error) {
 	db := GetDB()
@@ -216,17 +238,15 @@ func DeleteCourse(courseid int) (int, error) {
 func CompleteRegisterationToCourse(courseId int, studentId int, entryCode string) (bool, error) {
 	db := GetDB()
 
-	// if token == "" {
-	// 	return fmt.Errorf("token is required")
-	// }
-
 	if entryCode == "" {
 		return false, fmt.Errorf("entryCode is required")
 	}
 
 	res, err := db.Exec(
-		"UPDATE course_registration SET is_registered = 1 WHERE course_id = ? AND student_id = ? AND entry_code = uuid_to_bin(?)",
-		courseId, studentId, entryCode)
+		`UPDATE course_registration SET is_registered = 1
+			WHERE (select email_verified from students where id = ?) = 1 AND
+            course_id = ? AND student_id = ? AND entry_code = uuid_to_bin(?);`,
+		studentId, courseId, studentId, entryCode)
 
 	if err != nil {
 		log.Println(err)

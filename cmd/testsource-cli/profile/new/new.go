@@ -42,6 +42,7 @@ to quickly create a Cobra application.`,
 		}
 
 		isInstructor, _ := cmd.Flags().GetBool("instructor")
+		var target api.Person
 
 		if isInstructor {
 			instructor, err := api.GetInstructorByEmail(email)
@@ -54,6 +55,8 @@ to quickly create a Cobra application.`,
 				fmt.Println("Instructor not found")
 				return
 			}
+
+			target = *instructor
 		} else {
 			student, err := api.GetStudentByEmail(email)
 			if err != nil {
@@ -65,12 +68,11 @@ to quickly create a Cobra application.`,
 				fmt.Println("Student not found")
 				return
 			}
+
+			target = *student
 		}
 
-		err = datastorage.CreateNewUserProfile(name, datastorage.UserProfile{
-			Id:    name,
-			Email: email,
-		})
+		err = datastorage.CreateNewUserProfile(name, datastorage.UserProfile(target))
 
 		if err != nil {
 			fmt.Println(err)
