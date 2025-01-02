@@ -364,15 +364,6 @@ func CreateCourseHandler(c *gin.Context) {
 	})
 }
 
-/*************  ✨ Codeium Command ⭐  *************/
-// GetCourseHandler handles the HTTP GET request to retrieve a course by its ID.
-// The course ID is extracted from the URL parameters. If the course ID is missing
-// or invalid, it responds with a Bad Request status. If the course is not found,
-// it responds with a Not Found status. On success, it returns the course details
-// in JSON format with an OK status. If an internal error occurs, it responds with
-// an Internal Server Error status.
-
-/******  7f0c1da1-b1b9-429a-a51f-17c0eefacefd  *******/
 func GetCourseHandler(c *gin.Context) {
 	param_cid := c.Params.ByName("cid")
 
