@@ -61,7 +61,7 @@ func CreateAssignmentHandler(c *gin.Context) {
 		if mysqlError, ok := err.(*mysql.MySQLError); ok {
 			if mysqlError.Number == FOREIGN_KEY_NO_EXIST_ERROR {
 				c.JSON(http.StatusBadRequest, gin.H{
-					"error": fmt.Sprintf("course '%s' does not exist", assignment.CourseId),
+					"error": fmt.Sprintf("course '%d' does not exist", assignment.CourseId),
 				})
 			}
 			if mysqlError.Number == DUPLICATE_ENTRY_ERROR {
