@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
  * Created on Tue Dec 17 2024
  *
@@ -16,7 +13,6 @@ import (
 	"os"
 )
 
-const PATH_SEPARATOR string = "/"
 const PROFILE_FILE_NAME string = ".cstc_profiles"
 const STATE_FILE_NAME string = "state"
 
@@ -32,11 +28,19 @@ type UserProfile struct {
 	Email     string `json:"email"`
 }
 
+var pathSeparator string
 var state *systemState
 
 func init() {
-	profileFile := fmt.Sprintf("%s%s%s", ".", PATH_SEPARATOR, PROFILE_FILE_NAME)
-	stateFile := fmt.Sprintf("%s%s%s", ".", PATH_SEPARATOR, STATE_FILE_NAME)
+
+	if os.Getenv("GOOS") == "windows" {
+		pathSeparator = "\\"
+	} else {
+		pathSeparator = "/"
+	}
+
+	profileFile := fmt.Sprintf("%s%s%s", ".", pathSeparator, PROFILE_FILE_NAME)
+	stateFile := fmt.Sprintf("%s%s%s", ".", pathSeparator, STATE_FILE_NAME)
 
 	for _, file := range []string{stateFile, profileFile} {
 		if _, err := os.Stat(file); errors.Is(err, fs.ErrNotExist) {
@@ -63,7 +67,7 @@ func init() {
 
 // File ops
 func getStoredProfiles() (map[string]UserProfile, error) {
-	profileFile := fmt.Sprintf("%s%s%s", ".", PATH_SEPARATOR, PROFILE_FILE_NAME)
+	profileFile := fmt.Sprintf("%s%s%s", ".", pathSeparator, PROFILE_FILE_NAME)
 
 	data, err := os.ReadFile(profileFile)
 	if err != nil {
@@ -80,7 +84,7 @@ func getStoredProfiles() (map[string]UserProfile, error) {
 }
 
 func saveProfiles(userProfiles map[string]UserProfile) error {
-	stateFile := fmt.Sprintf("%s%s%s", ".", PATH_SEPARATOR, PROFILE_FILE_NAME)
+	stateFile := fmt.Sprintf("%s%s%s", ".", pathSeparator, PROFILE_FILE_NAME)
 
 	data, err := json.Marshal(userProfiles)
 	if err != nil {
@@ -91,7 +95,7 @@ func saveProfiles(userProfiles map[string]UserProfile) error {
 }
 
 func loadState() error {
-	data, err := os.ReadFile(fmt.Sprintf("%s%s%s", ".", PATH_SEPARATOR, STATE_FILE_NAME))
+	data, err := os.ReadFile(fmt.Sprintf("%s%s%s", ".", pathSeparator, STATE_FILE_NAME))
 
 	if err != nil {
 		return err
@@ -107,7 +111,7 @@ func loadState() error {
 }
 
 func saveState() error {
-	stateFile := fmt.Sprintf("%s%s%s", ".", PATH_SEPARATOR, STATE_FILE_NAME)
+	stateFile := fmt.Sprintf("%s%s%s", ".", pathSeparator, STATE_FILE_NAME)
 
 	data, err := json.Marshal(state)
 	if err != nil {
@@ -202,7 +206,7 @@ func SetNewActiveProfileState(profile string) error {
 		return err
 	}
 
-	for k, _ := range userProfiles {
+	for k := range userProfiles {
 		if k == profile {
 			state.CurrentProfile = k
 			saveState()
