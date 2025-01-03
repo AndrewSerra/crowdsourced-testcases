@@ -28,15 +28,19 @@ type UserProfile struct {
 	Email     string `json:"email"`
 }
 
-var pathSeparator string
+var pathSeparator, profileStatePath string
 var state *systemState
 
 func init() {
 
 	if os.Getenv("GOOS") == "windows" {
 		pathSeparator = "\\"
+		// TODO: Fix this path for windows
+		profileStatePath = "./etc/testsource"
 	} else {
 		pathSeparator = "/"
+		// TODO: Fix this to use root path
+		profileStatePath = "./etc/testsource"
 	}
 
 	profileFile := fmt.Sprintf("%s%s%s", ".", pathSeparator, PROFILE_FILE_NAME)
@@ -58,6 +62,14 @@ func init() {
 				fmt.Println(err)
 				os.Exit(1)
 			}
+		}
+	}
+
+	if _, err := os.Stat(profileStatePath); errors.Is(err, fs.ErrNotExist) {
+		err = os.MkdirAll(profileStatePath, 0755)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
 	}
 
@@ -121,6 +133,25 @@ func saveState() error {
 	return os.WriteFile(stateFile, data, 0644)
 }
 
+func createProfileStateFile(profileName string) error {
+	stateFile := fmt.Sprintf("%s%s%s", profileStatePath, pathSeparator, profileName)
+	if _, err := os.Stat(stateFile); err != nil {
+		file, err := os.Create(stateFile)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		var emptymap map[string]string = make(map[string]string)
+		err = json.NewEncoder(file).Encode(emptymap)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return fmt.Errorf("file '%s' already exists", stateFile)
+}
+
 // Profile File Operations
 func GetActiveUserProfile() (*UserProfile, error) {
 	userProfiles, err := getStoredProfiles()
@@ -138,7 +169,6 @@ func GetActiveUserProfile() (*UserProfile, error) {
 }
 
 func CreateNewUserProfile(profileName string, profile UserProfile) error {
-	fmt.Println(profile)
 	userProfiles, err := getStoredProfiles()
 	if err != nil {
 		return err
@@ -150,6 +180,10 @@ func CreateNewUserProfile(profileName string, profile UserProfile) error {
 		if err = saveState(); err != nil {
 			return err
 		}
+	}
+
+	if err = createProfileStateFile(profileName); err != nil {
+		return err
 	}
 	return saveProfiles(userProfiles)
 }
