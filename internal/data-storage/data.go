@@ -74,6 +74,14 @@ func (c *course) RemoveAssigment(a *assignment) {
 	}
 }
 
+func (c course) PushlishAssignment(id int) {
+	for _, a := range c.Assignments {
+		if a.Id == id {
+			a.Publish()
+		}
+	}
+}
+
 func (c course) GetAssignmentByName(name string) *assignment {
 	for _, a := range c.Assignments {
 		if a.Name == name {
@@ -98,7 +106,7 @@ type assignment struct {
 	Start     time.Time
 	End       time.Time
 	Published bool
-	Open      bool
+	isOpen    bool
 }
 
 func NewAssignment(name string, start time.Time, end time.Time, published bool, open bool) *assignment {
@@ -107,6 +115,22 @@ func NewAssignment(name string, start time.Time, end time.Time, published bool, 
 		Start:     start,
 		End:       end,
 		Published: published,
-		Open:      open,
+		isOpen:    open,
 	}
+}
+
+func (a *assignment) Publish() {
+	a.Published = true
+}
+
+func (a *assignment) Unpublish() {
+	a.Published = false
+}
+
+func (a *assignment) Open() {
+	a.isOpen = true
+}
+
+func (a *assignment) Close() {
+	a.isOpen = false
 }
