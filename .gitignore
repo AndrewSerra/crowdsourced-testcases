@@ -1,3 +1,4 @@
 *.csv
 .cstc_profiles
 state
+**/*/etc/*
