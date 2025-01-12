@@ -17,8 +17,7 @@ const PROFILE_FILE_NAME string = ".cstc_profiles"
 const STATE_FILE_NAME string = "state"
 
 type systemState struct {
-	CurrentProfile string            `json:"active_profile"`
-	Data           map[string]string `json:"data"`
+	CurrentProfile string `json:"active_profile"`
 }
 
 type UserProfile struct {
@@ -30,6 +29,7 @@ type UserProfile struct {
 
 var pathSeparator, profileStatePath string
 var state *systemState
+var dataState *profileData
 
 func init() {
 
@@ -75,6 +75,8 @@ func init() {
 
 	state = new(systemState)
 	loadState()
+	dataState = NewProfileData(state.CurrentProfile)
+	loadActiveProfileDataState()
 }
 
 // File ops
@@ -114,6 +116,22 @@ func loadState() error {
 	}
 
 	err = json.Unmarshal(data, state)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+func loadActiveProfileDataState() error {
+	dataFile, err := os.ReadFile(fmt.Sprintf("%s%s%s", profileStatePath, pathSeparator, GetActiveProfileName()))
+
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(dataFile, &dataState)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -202,6 +220,11 @@ func DeleteUserProfile(profileName string) error {
 			return err
 		}
 	}
+
+	if err = os.Remove(fmt.Sprintf("%s%s%s", profileStatePath, pathSeparator, profileName)); err != nil {
+		return err
+	}
+
 	return saveProfiles(userProfiles)
 }
 
@@ -259,3 +282,28 @@ func clearActiveProfileState() error {
 func GetActiveProfileName() string {
 	return state.CurrentProfile
 }
+
+func GetAvailableCoursesForActiveProfile() ([]Course, error) {
+	return dataState.Courses, nil
+}
+
+func GetAvailableAssignmentsForCourse(courseId int) ([]Assignment, error) {
+	for _, course := range dataState.Courses {
+		if course.Id == courseId {
+			return course.Assignments, nil
+		}
+	}
+	return nil, fmt.Errorf("course-id '%d' not found", courseId)
+}
+
+func GetAllAssignmentsForActiveProfile() ([]Assignment, error) {
+	var assignments []Assignment
+	for _, course := range dataState.Courses {
+		for _, assignment := range course.Assignments {
+			assignments = append(assignments, assignment)
+		}
+	}
+	return assignments, nil
+}
+
+// Profile Data State File Operations

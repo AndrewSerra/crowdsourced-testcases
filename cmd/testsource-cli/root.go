@@ -9,6 +9,7 @@ package main
 import (
 	"os"
 
+	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/available"
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/edit"
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/join"
 	"github.com/AndrewSerra/crowdsourced-testcases/cmd/testsource-cli/new"
@@ -34,6 +35,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(available.AvailableCmd)
 	rootCmd.AddCommand(edit.EditCmd)
 	rootCmd.AddCommand(join.JoinCmd)
 	rootCmd.AddCommand(new.NewCmd)
