@@ -172,6 +172,48 @@ func GetStudentByEmail(email string) (*Person, error) {
 	return getPersonByEmail(email, STUDENT)
 }
 
+func PublishAssignmentGradesByName(ownerid int, courseid int, assignmentid int) error {
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/courses/%d/assignments/%d/publish", url, courseid, assignmentid), nil)
+	if err != nil {
+		return err
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		fmt.Println(res)
+		return fmt.Errorf("failed to publish assignment")
+	}
+
+	return nil
+}
+
+func UnpublishAssignmentGradesByName(ownerid int, courseid int, assignmentid int) error {
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/courses/%d/assignments/%d/unpublish", url, courseid, assignmentid), nil)
+	if err != nil {
+		return err
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		fmt.Println(res)
+		return fmt.Errorf("failed to unpublish assignment")
+	}
+
+	return nil
+}
+
 func getPersonByEmail(email string, t persontype) (*Person, error) {
 	resp, err := http.Get(fmt.Sprintf("%s/%ss?email=%s", url, t, email))
 	if err != nil {

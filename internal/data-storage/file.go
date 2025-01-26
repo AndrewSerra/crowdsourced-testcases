@@ -299,11 +299,13 @@ func GetAvailableAssignmentsForCourse(courseId int) ([]Assignment, error) {
 func GetAllAssignmentsForActiveProfile() ([]Assignment, error) {
 	var assignments []Assignment
 	for _, course := range dataState.Courses {
-		for _, assignment := range course.Assignments {
-			assignments = append(assignments, assignment)
-		}
+		assignments = append(assignments, course.Assignments...)
 	}
 	return assignments, nil
+}
+
+func GetAssignmentCourse(assignmentName string) (Course, error) {
+	return dataState.GetAssignmentCourse(assignmentName)
 }
 
 // Profile Data State File Operations

@@ -6,6 +6,7 @@
 package datastorage
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -50,6 +51,18 @@ func (p profileData) GetCourseById(id int) *Course {
 		}
 	}
 	return nil
+}
+
+func (p profileData) GetAssignmentCourse(assignementName string) (Course, error) {
+	for _, c := range p.Courses {
+		if len(c.Assignments) > 0 {
+			assignment := c.GetAssignmentByName(assignementName)
+			if assignment != nil {
+				return c, nil
+			}
+		}
+	}
+	return Course{}, fmt.Errorf("no assignment with name %s", assignementName)
 }
 
 type Course struct {

@@ -36,7 +36,7 @@ func main() {
 			assignmentGroup.GET("/", GetAssignmentsForCourseHandler)
 			assignmentGroup.GET("/:aid", GetAssignmentHandler)
 			assignmentGroup.DELETE("/:aid", DeleteAssignmentHandler)
-			assignmentGroup.POST("/:aid/*action", AssignmentActionsHandler)
+			assignmentGroup.PATCH("/:aid/*action", AssignmentActionsHandler)
 		}
 	}
 
